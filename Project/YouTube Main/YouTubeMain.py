@@ -1,70 +1,74 @@
-import os
-import tkinter
-
-import requests as req
+import pandas as pd
 from bs4 import BeautifulSoup as bs
-from requests_html import HTMLSession
-from selenium import webdriver as wdrv
-from helium import *
-
-# from webdriver-manager.firefox import GeckoDriverManager
-from webdriver_manager.chrome import ChromeDriver
-# import pandas as pd
-# from googleapiclient.discovery import build
-# from Classes.HeaderandCookies import HeaderandCookie as HandC
-
-import time
+from requests_html import AsyncHTMLSession
+import asyncio
+import time as t
+import pyodbc as odbc
+import re
+from YT_NEW_VID_ID import YT_NEW_VID_ID
 
 
-a = time.time()
-url = 'https://www.youtube.com/watch?v=4VfqVpTz4Q4'
-session = HTMLSession()
-r = session.get(url)
-r.html.render(sleep=1,keep_page=True,scrolldown=1)
-# videos = r.html.xpath('//*[@id="video-title"]',first=True)
-titles = r.html.find('#dismissible')
-try:
-    for item in titles:
-        data = bs(item.html,'lxml')
-        sub_data = data.find_all('div',class_='metadata style-scope ytd-compact-video-renderer')
-        for main_data in sub_data:
-            store = {'title':main_data.find('span',id='video-title').text.strip(),'link_code':main_data.find('a',rel='nofollow')['href']}
-            print(store)
-        # for title in titles:
-        #     print(title.text.strip())
-        # links = data.find_all('a',rel='nofollow')
-        # for link in links:
-        #     print(link['href'])
-except:
-    print('link not found')
-b = time.time()
-print(b - a)
+class YouTube_Related_Videos:
 
-#x = wdrv.Firefox(executable_path=r'C:\Users\moham\Desktop\Python Projects\YouTube\Imports\chromedriver.exe.exe',options=options)
-#contents = data.find_all('div',class_='style-scope-ytd-item-section-renderer',id='contents')
-# contents2 =content['aria-label']
+    def __init__(self,url):
+        self.new_vid_id = ''
+        self.url = url
+        pass
 
+    async def process1_get_related_videos(self,url):
+        try:
+            self.asession = AsyncHTMLSession()
+            if self.url == '' or self.url is None or len(self.url) != 43:
+                self.url = 'https://www.youtube.com/watch?v=4VfqVpTz4Q4'
 
-# for content in contents:
-
-# videos = r.html.xpath('//*[@id="video-title"]',first=True)
-
-# for item in r.html.absolute_links:
-#     x = session.get(item)
-#     print(x.html.text)
-
-# try:
-#     for content in contents:
-#         print(content)
-# except:
-#     pass
+            self.vid_info = dict()
+            self.a = t.time()
+            if len(self.url) != 43 or re.search(r'watch?v=', self.url) is None:
+                self.url = 'https://www.youtube.com/watch?v=4VfqVpTz4Q4'
 
 
 
-# data = resp.read()
-# html = data.decode("UTF-8")
-# print(html)
-# api_key = os.environ.get("YT_API_KEY")
-# api_key = pd.read_json("api_key.json").loc["api_key"]['data']
-# service = build('youtube','v3',developerKey=api_key)
-# request = service.channels().list(part='statistics',forUsername='schafer5')
+            self.r = await self.asession.get(self.url)
+            task = asyncio.create_task(self.r.html.arender(sleep=1,scrolldown=10,keep_page=True))
+            print('before wait')
+            await task
+            print('after wait')
+            self.titles = self.r.html.find('#dismissible')
+            await self.asession.close()
+            self.r.close()
+
+        except Exception as EEE:
+            print('Not a valid video link, resuming video crawl from DB: ', EEE)
+        try:
+            for self.item in self.titles:
+                self.data = bs(self.item.html, 'lxml')
+                self.sub_data = self.data.find_all('div', class_='metadata style-scope ytd-compact-video-renderer')
+                for self.main_data in self.sub_data:
+                    self.vid_info[self.main_data.find('span', id='video-title').text.strip()] = self.main_data.find('a', rel='nofollow')[
+                        'href']
+
+            self.b = t.time()
+            print(f'Time taken to get the related video id`s: {self.b - self.a}')
+            return (self.vid_info)
+
+        except:
+            print('link not found')
+
+    def run_final(self):
+        try:
+            print('first step: ',self.url)
+            task1 = asyncio.run(self.process1_get_related_videos(str(self.url)))
+            self.rel_vids = task1
+            return self.rel_vids
+
+        except Exception as e:
+            print('Some error while fetching the data ',e)
+
+
+
+
+
+
+
+
+
