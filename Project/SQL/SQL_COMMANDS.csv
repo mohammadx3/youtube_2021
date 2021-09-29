@@ -68,3 +68,13 @@ EXEC 	 [dbo].[YT_REMOVE_INFO]
 		@P_STATUS = @P_STATUS OUTPUT;
 
 SELECT	 @P_STATUS;"
+5,Retrieve Video ID`s to save details,YT_GET_NEXT_VID_IDS,"
+DECLARE 	 @P_STATUS varchar(12),
+		@P_MESSAGE varchar(100)
+
+EXEC	  [dbo].[YT_GET_NEXT_VID_IDS]
+		@P_STATUS = @P_STATUS OUTPUT,
+		@P_MESSAGE = @P_MESSAGE OUTPUT
+
+SELECT	 @P_STATUS,
+		@P_MESSAGE "

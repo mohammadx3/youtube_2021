@@ -4,6 +4,7 @@ import time as t
 import re
 class YT_NEW_VID_ID:
     def __init__(self):
+        self.vid_ids_list = []
         pass
     def generate_next_vid_id(self):
         df = pd.read_csv('C:\\Users\\moham\\Desktop\\Python Projects\\YouTube\\Project\\SQL\\SQL_COMMANDS.csv')
@@ -114,13 +115,32 @@ class YT_NEW_VID_ID:
     #     except Exception as Exx :
     #         print('Error Inserting Video id to the database, please try again: ', Exx)
 
+    def get_new_vid_ids(self):
+        self.conn = odbc.connect('Driver={SQL Server Native Client 11.0};'
+                            'MultipleActiveResultSets={True};'
+                            'Server=MAXIMUS2;'
+                            'username = mabbas;'
+                            'password = ninjaX3@;'
+                            'Database=CRW_YT;'
+                            'Trusted_Connection=yes;'
+                            )
+        self.cursor = self.conn.cursor()
+        self.sql_read = pd.read_csv('C:\\Users\\moham\\Desktop\\Python Projects\\YouTube\\Project\\SQL\\SQL_COMMANDS.csv')
+        self.sql = self.sql_read[self.sql_read['TABLE'] == 'YT_GET_NEXT_VID_IDS']['SQL'][4]
+        self.cursor.execute(self.sql)
+        self.resultset = self.cursor.fetchall()
+        self.cursor.close()
+        self.conn.close()
+        for self.j in self.resultset:
+            self.vid_ids_list.append(self.j[0])
+        return self.vid_ids_list
 
     def get_next_related_video_id(self):
         try:
             self.conn = odbc.connect('Driver={SQL Server Native Client 11.0};'
                                 'Server=MAXIMUS2;'
                                 'username = mabbas;'
-                                'password = ninjaX3@;'
+                                'password = pass@12345'
                                 'Database=CRW_YT;'
                                 'Trusted_Connection=yes;'
                                 )
@@ -133,6 +153,9 @@ class YT_NEW_VID_ID:
                             ' @VIDEO_ID = @next_vid_id OUTPUT; ' \
                             ' SELECT @next_vid_id'
         self.cursor.execute(self.next_video_id_sql)
-        self.next_vid_id = self.cursor.fetchone()[0]
+        self.next_vid_id = self.cursor.fetchall()
+        self.vid_list = []
+        for self.iter in self.next_vid_id:
+            self.vid_list.append(self.iter[0])
         self.conn.close()
-        return self.next_vid_id
+        return self.vid_list

@@ -61,8 +61,8 @@ class YouTubeAPI:
             self.all_vid_details['categoryName'] = self.response3['items'][0]['snippet']['title']
             self.all_vid_details['commentCount'] = self.response['items'][0]['statistics'].get('commentCount','0')
             self.all_vid_details['viewCount'] = self.response['items'][0]['statistics']['viewCount']
-            self.all_vid_details['likeCount'] = self.response['items'][0]['statistics']['likeCount']
-            self.all_vid_details['dislikeCount'] = self.response['items'][0]['statistics']['dislikeCount']
+            self.all_vid_details['likeCount'] = self.response['items'][0]['statistics'].get('likeCount',0)
+            self.all_vid_details['dislikeCount'] = self.response['items'][0]['statistics'].get('dislikeCount',0)
             self.all_vid_details['favoriteCount'] = self.response['items'][0]['statistics']['favoriteCount']
             self.all_vid_details['duration'] = (self.hours*60*60) + (self.mins * 60) + self.secs
             self.all_vid_details['definition'] = self.response['items'][0]['contentDetails']['definition']
@@ -119,8 +119,7 @@ class YouTubeAPI:
 
 
 
-if __name__ == '__main__':
-    pass
+
 
 
 

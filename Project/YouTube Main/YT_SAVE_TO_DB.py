@@ -2,18 +2,21 @@ import pyodbc as odbc
 import pandas as pd
 import re
 import time as t
+import logging as log
+
 class YT_SAVE_TO_DB:
-    def __init__(self,vid_details,channel_details):
+    def __init__(self):
+        pass
+
+
+    def save_vid_details(self,vid_details,channel_details):
         self.vid_details = vid_details
         self.channel_details = channel_details
-
-
-    def save_vid_details(self):
         self.conn = odbc.connect('Driver={SQL Server Native Client 11.0};'
                                  'MultipleActiveResultSets={True};'
                                  'Server=MAXIMUS2;'
                                  'username = mabbas;'
-                                 'password = ninjaX3@;'
+                                 'password = pass@12345;'
                                  'Database=CRW_YT;'
                                  'Trusted_Connection=yes;'
                                  )
@@ -43,7 +46,9 @@ class YT_SAVE_TO_DB:
             # self.cursor.close()
             # self.conn.close()
         except Exception as Ex:
-            print('some error occurred while saving video data: ', Ex)
+            log.basicConfig(filename='error_logger.log', encoding='utf-8', level=log.Logger)
+            log.info('Video Detail Save output: ' + self.vid_details['videoId']+' and Error detail from db:', Ex)
+            print('some error occurred while saving video data for id: '+self.vid_details['videoId']+' , Error:', Ex)
 
     # def save_channel_details(self):
     #     self.conn = odbc.connect('Driver={SQL Server Native Client 11.0};'
@@ -80,7 +85,9 @@ class YT_SAVE_TO_DB:
             self.conn.close()
             return self.result[0]
         except Exception as Ex:
-            print('some error occurred while saving channel data: ', Ex)
+            log.basicConfig(filename='error_logger.log', encoding='utf-8', level=log.Logger)
+            log.info('Video Detail Save output: ' + self.vid_details['videoId'] + ' and Error detail from db:', Ex)
+            print('some error occurred while saving channel data for id '+self.vid_details['videoId']+' , Error:', Ex)
 
     def save_to_DB(self, orig_url, vid_data):
         self.orig_url = orig_url
@@ -96,7 +103,7 @@ class YT_SAVE_TO_DB:
                                      'MultipleActiveResultSets={True};'
                                 'Server=MAXIMUS2;'
                                 'username = mabbas;'
-                                'password = ninjaX3@;'
+                                'password = pass@12345;'
                                 'Database=CRW_YT;'
                                 'Trusted_Connection=yes;'
                                 )
@@ -143,7 +150,7 @@ class YT_SAVE_TO_DB:
 
 
         except Exception as Exx :
-            print('Error Inserting Video id to the database, please try again: ', Exx)
+            print(f'Error Inserting Video id to the database ,please try again: ', Exx)
 
 
 
